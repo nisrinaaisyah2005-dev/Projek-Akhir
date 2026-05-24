@@ -1,7 +1,7 @@
 [theme]
 primaryColor             = "#E6A817"   # kuning — tombol, tab aktif, slider
-backgroundColor          = "#FFFCF0"   # kuning sangat soft — latar halaman utama
-secondaryBackgroundColor = "#FFF5CC"   # kuning muda — sidebar & card
+backgroundColor          = "#FFF8DC"   # kuning soft — latar halaman utama
+secondaryBackgroundColor = "#F5D76E"   # kuning lebih tua — sidebar & card
 textColor                = "#2e1f00"   # coklat tua — teks
 
 font = "sans serif"
