@@ -84,7 +84,7 @@ def load_and_clean(url: str):
     try:
         df_raw = pd.read_csv(url)
     except Exception as e:
-        st.error(f"❌ Gagal memuat data dari GitHub.\n\nPastikan URL sudah benar di variabel `GITHUB_DATA_URL`.\n\nError: {e}")
+        st.error(f"Gagal memuat data dari GitHub.\n\nPastikan URL sudah benar di variabel `GITHUB_DATA_URL`.\n\nError: {e}")
         st.stop()
 
     df = df_raw.copy()
@@ -181,12 +181,12 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("**Navigasi**")
     page = st.radio("Pilih Halaman", [
-        "📊 Overview",
-        "🔍 EDA",
-        "📈 Analisis Statistik",
-        "🗺️ Analisis Stasiun",
-        "🤖 Machine Learning",
-        "💡 Insight & Ringkasan",
+        "Overview",
+        "EDA",
+        "Analisis Statistik",
+        "Analisis Stasiun",
+        "Machine Learning",
+        "Insight & Ringkasan",
     ])
 
 # ─── Load Data ────────────────────────────────────────────────────────────────
@@ -196,8 +196,8 @@ df = load_and_clean(GITHUB_DATA_URL)
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE: OVERVIEW
 # ══════════════════════════════════════════════════════════════════════════════
-if page == "📊 Overview":
-    st.title("📊 Overview Dataset")
+if page == "Overview":
+    st.title("Overview Dataset")
 
     # KPI
     col1, col2, col3, col4, col5 = st.columns(5)
@@ -276,8 +276,8 @@ if page == "📊 Overview":
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE: EDA
 # ══════════════════════════════════════════════════════════════════════════════
-elif page == "🔍 EDA":
-    st.title("🔍 Exploratory Data Analysis")
+elif page == "EDA":
+    st.title("Exploratory Data Analysis")
 
     tab1, tab2, tab3 = st.tabs(["Distribusi Data", "Pola Temporal", "Demografis"])
 
@@ -408,8 +408,8 @@ elif page == "🔍 EDA":
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE: ANALISIS STATISTIK
 # ══════════════════════════════════════════════════════════════════════════════
-elif page == "📈 Analisis Statistik":
-    st.title("📈 Analisis Statistik")
+elif page == "Analisis Statistik":
+    st.title("Analisis Statistik")
 
     tab1, tab2, tab3, tab4 = st.tabs(["Uji Mann-Whitney", "Korelasi Spearman", "Agregasi", "Tren Musiman"])
 
@@ -434,7 +434,7 @@ elif page == "📈 Analisis Statistik":
             | Median (mnt) | {dur_sub.median():.2f} | {dur_cus.median():.2f} |
             | Mean (mnt) | {dur_sub.mean():.2f} | {dur_cus.mean():.2f} |
             """)
-            status1 = "✅ SIGNIFIKAN (p < 0.05)" if p1 < 0.05 else "❌ Tidak signifikan"
+            status1 = "SIGNIFIKAN (p < 0.05)" if p1 < 0.05 else "Tidak signifikan"
             st.metric("Statistik U", f"{stat1:,.0f}")
             st.metric("P-value", f"{p1:.6f}")
             st.success(status1) if p1 < 0.05 else st.warning(status1)
@@ -448,7 +448,7 @@ elif page == "📈 Analisis Statistik":
             | Median (mnt) | {dur_wd.median():.2f} | {dur_we.median():.2f} |
             | Mean (mnt) | {dur_wd.mean():.2f} | {dur_we.mean():.2f} |
             """)
-            status2 = "✅ SIGNIFIKAN (p < 0.05)" if p2 < 0.05 else "❌ Tidak signifikan"
+            status2 = "SIGNIFIKAN (p < 0.05)" if p2 < 0.05 else "Tidak signifikan"
             st.metric("Statistik U", f"{stat2:,.0f}")
             st.metric("P-value", f"{p2:.6f}")
             st.success(status2) if p2 < 0.05 else st.warning(status2)
@@ -486,7 +486,7 @@ elif page == "📈 Analisis Statistik":
         kw_h, kw_p = stats.kruskal(*groups_g)
         st.markdown(f"**Kruskal-Wallis Test (Durasi antar Gender):** H = {kw_h:.2f}, p = {kw_p:.6f}")
         if kw_p < 0.05:
-            st.success("✅ Terdapat perbedaan durasi signifikan antar gender (p < 0.05)")
+            st.success("Terdapat perbedaan durasi signifikan antar gender (p < 0.05)")
         else:
             st.warning("Tidak ada perbedaan signifikan antar gender")
 
@@ -536,8 +536,8 @@ elif page == "📈 Analisis Statistik":
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE: ANALISIS STASIUN
 # ══════════════════════════════════════════════════════════════════════════════
-elif page == "🗺️ Analisis Stasiun":
-    st.title("🗺️ Analisis Stasiun")
+elif page == "Analisis Stasiun":
+    st.title("Analisis Stasiun")
 
     top_n = st.slider("Tampilkan Top N Stasiun", 5, 20, 10)
 
@@ -588,8 +588,8 @@ elif page == "🗺️ Analisis Stasiun":
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE: MACHINE LEARNING
 # ══════════════════════════════════════════════════════════════════════════════
-elif page == "🤖 Machine Learning":
-    st.title("🤖 Segmentasi Pengguna — K-Means Clustering")
+elif page == "Machine Learning":
+    st.title("Segmentasi Pengguna - K-Means Clustering")
 
     st.info("Segmentasi berbasis perilaku: durasi perjalanan, usia, jam keberangkatan, dan hari penggunaan.")
 
@@ -666,8 +666,8 @@ elif page == "🤖 Machine Learning":
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE: INSIGHT & RINGKASAN
 # ══════════════════════════════════════════════════════════════════════════════
-elif page == "💡 Insight & Ringkasan":
-    st.title("💡 Insight & Ringkasan Eksekutif")
+elif page == "Insight & Ringkasan":
+    st.title("Insight & Ringkasan Eksekutif")
 
     st.markdown("""
     ## Ringkasan Eksekutif — NYC Citi Bike Trips
@@ -676,18 +676,24 @@ elif page == "💡 Insight & Ringkasan":
     """)
 
     insights = [
-        ("🕐 Pola Komuter Urban", COLOR_BLUE,
-         "Pola bimodal rush-hour (07:00-09:00 & 17:00-19:00) dan dominasi subscriber membuktikan Citi Bike berhasil "
-         "menjadi moda transportasi komuter harian. Fokus strategis: keandalan ketersediaan sepeda saat jam puncak."),
-        ("👥 Segmentasi Pengguna Jelas", COLOR_ORANGE,
-         "Dua persona dominan: Subscriber (komuter cepat, trip pendek) dan Customer (rekreasi/wisata, trip lebih panjang ~2-3x). "
-         "Strategi pricing dan promosi harus dibedakan untuk tiap segmen."),
-        ("📊 Pola Musiman Kuat", COLOR_GREEN,
-         "Penggunaan meningkat signifikan di musim semi/panas dan menurun drastis di musim dingin. "
-         "Rasio puncak/terendah mencerminkan kebutuhan perencanaan kapasitas armada musiman."),
-        ("♿ Potensi Inklusi Belum Maksimal", COLOR_RED,
-         "Kelompok lansia (65+) dan remaja sangat rendah representasinya meski lansia justru bersepeda lebih lama. "
-         "Program khusus dapat meningkatkan inklusi dan memperluas basis pengguna."),
+        ("Pola Komuter di Kawasan Urban", COLOR_BLUE,
+ "Adanya dua waktu puncak penggunaan, yaitu pagi (07.00–09.00) dan sore (17.00–19.00), serta dominasi pengguna subscriber "
+ "menunjukkan bahwa Citi Bike banyak dimanfaatkan sebagai transportasi harian untuk aktivitas bekerja atau berkomuter. "
+ "Hal ini mengindikasikan pentingnya menjaga ketersediaan sepeda pada jam sibuk."),
+
+("Segmentasi Pengguna yang Berbeda", COLOR_ORANGE,
+ "Terdapat dua kelompok pengguna utama dengan karakteristik yang cukup berbeda. Pengguna subscriber cenderung memakai Citi Bike "
+ "untuk perjalanan singkat dan rutin, sedangkan customer lebih sering menggunakan untuk rekreasi atau perjalanan santai dengan durasi lebih lama. "
+ "Perbedaan ini menunjukkan bahwa strategi promosi maupun penetapan harga dapat disesuaikan untuk masing-masing segmen."),
+
+("Pengaruh Musim terhadap Penggunaan", COLOR_GREEN,
+ "Jumlah penggunaan Citi Bike meningkat pada musim semi dan musim panas, kemudian menurun cukup tajam saat musim dingin. "
+ "Pola ini menunjukkan bahwa faktor cuaca berpengaruh besar terhadap permintaan, sehingga perencanaan jumlah armada perlu mempertimbangkan kondisi musiman."),
+
+("Peluang Memperluas Jangkauan Pengguna", COLOR_RED,
+ "Kelompok pengguna usia lanjut (65+) dan remaja masih memiliki proporsi yang rendah dibanding kelompok usia lainnya. "
+ "Padahal, pengguna lansia cenderung memiliki durasi perjalanan lebih lama. Kondisi ini membuka peluang untuk program atau layanan yang lebih inklusif "
+ "guna menjangkau lebih banyak pengguna dari berbagai kelompok usia."),
     ]
 
     for title, color, text in insights:
@@ -700,7 +706,7 @@ elif page == "💡 Insight & Ringkasan":
         """, unsafe_allow_html=True)
 
     st.markdown("---")
-    st.markdown("### 📌 Implikasi Operasional")
+    st.markdown("### Implikasi Operasional")
     ops = {
         "Rebalancing Armada": "Prioritaskan jam 07-09 dan 17-19 serta stasiun bisnis ↔ permukiman",
         "Pricing Strategy": "Loyalty reward untuk subscriber; paket wisata untuk customer",
