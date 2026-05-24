@@ -79,7 +79,7 @@ st.markdown("""
 GITHUB_DATA_URL = "https://raw.githubusercontent.com/nisrinaaisyah2005-dev/Projek-Akhir/refs/heads/main/df_original.csv"
 
 # ─── Load & Cache Data ────────────────────────────────────────────────────────
-@st.cache_data(show_spinner="⏳ Memuat data dari GitHub...")
+@st.cache_data(show_spinner="Memuat data dari GitHub...")
 def load_and_clean(url: str):
     try:
         df_raw = pd.read_csv(url)
@@ -330,45 +330,35 @@ elif page == "EDA":
         st.markdown("**Statistik Deskriptif**")
         st.dataframe(df[['tripduration_min', 'age']].describe().round(2))
 
-    with tab2:
-        st.markdown('<div class="section-title">Pola Temporal</div>', unsafe_allow_html=True)
-        DAY_ORDER = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
-        trend_hour    = df['start_hour'].value_counts().sort_index()
-        trend_weekday = (df.groupby('start_weekday_name').size()
-                          .reindex([d for d in DAY_ORDER if d in df['start_weekday_name'].unique()]))
+with tab2:
+    st.markdown('<div class="section-title">Pola Temporal</div>', unsafe_allow_html=True)
+    DAY_ORDER = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+    trend_hour = df['start_hour'].value_counts().sort_index()
 
-        fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-        axes[0].bar(trend_hour.index, trend_hour.values, color=COLOR_BLUE, edgecolor='white', alpha=0.85)
-        axes[0].set_title('Volume Trip per Jam')
-        axes[0].set_xlabel('Jam'); axes[0].set_ylabel('Jumlah Trip')
-        axes[0].yaxis.set_major_formatter(mticker.FuncFormatter(lambda x,_: f'{x/1000:.0f}k'))
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.bar(trend_hour.index, trend_hour.values, color=COLOR_BLUE, edgecolor='white', alpha=0.85)
+    ax.set_title('Volume Trip per Jam')
+    ax.set_xlabel('Jam'); ax.set_ylabel('Jumlah Trip')
+    ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x,_: f'{x/1000:.0f}k'))
+    plt.tight_layout()
+    st.pyplot(fig)
+    plt.close()
 
-        axes[1].bar(range(len(trend_weekday)), trend_weekday.values, color=PALETTE_MAIN[:7], edgecolor='white')
-        axes[1].set_xticks(range(len(trend_weekday)))
-        axes[1].set_xticklabels(trend_weekday.index, rotation=25, ha='right')
-        axes[1].set_title('Volume Trip per Hari')
-        axes[1].set_ylabel('Jumlah Trip')
-        axes[1].yaxis.set_major_formatter(mticker.FuncFormatter(lambda x,_: f'{x/1000:.0f}k'))
-
-        plt.tight_layout()
-        st.pyplot(fig)
-        plt.close()
-
-        # Heatmap weekday vs weekend
-        st.markdown("**Heatmap: Jam × Hari (Weekday vs Weekend)**")
-        fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-        for ax, is_we, label in zip(axes, [False, True], ['Weekday', 'Weekend']):
-            pivot = (df[df['is_weekend']==is_we]
-                     .groupby(['start_weekday_name', 'start_hour'])
-                     .size().unstack(fill_value=0))
-            pivot = pivot.reindex([d for d in DAY_ORDER if d in pivot.index])
-            sns.heatmap(pivot, ax=ax, cmap='YlOrRd', fmt='.0f',
-                        linewidths=0.3, cbar_kws={'shrink': 0.8})
-            ax.set_title(f'Heatmap Volume Trip — {label}')
-            ax.set_xlabel('Jam'); ax.set_ylabel('Hari')
-        plt.tight_layout()
-        st.pyplot(fig)
-        plt.close()
+    # Heatmap weekday vs weekend
+    st.markdown("**Heatmap: Jam × Hari (Weekday vs Weekend)**")
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    for ax, is_we, label in zip(axes, [False, True], ['Weekday', 'Weekend']):
+        pivot = (df[df['is_weekend']==is_we]
+                 .groupby(['start_weekday_name', 'start_hour'])
+                 .size().unstack(fill_value=0))
+        pivot = pivot.reindex([d for d in DAY_ORDER if d in pivot.index])
+        sns.heatmap(pivot, ax=ax, cmap='YlOrRd', fmt='.0f',
+                    linewidths=0.3, cbar_kws={'shrink': 0.8})
+        ax.set_title(f'Heatmap Volume Trip — {label}')
+        ax.set_xlabel('Jam'); ax.set_ylabel('Hari')
+    plt.tight_layout()
+    st.pyplot(fig)
+    plt.close()
 
     with tab3:
         st.markdown('<div class="section-title">Analisis Demografis</div>', unsafe_allow_html=True)
@@ -670,14 +660,14 @@ elif page == "Insight & Ringkasan":
     st.title("Insight & Ringkasan Eksekutif")
 
     st.markdown("""
-    ## Ringkasan Eksekutif — NYC Citi Bike Trips
+    ## Ringkasan Eksekutif - NYC Citi Bike Trips
     
     Analisis dataset menghasilkan empat tema utama:
     """)
 
     insights = [
         ("Pola Komuter di Kawasan Urban", COLOR_BLUE,
- "Adanya dua waktu puncak penggunaan, yaitu pagi (07.00–09.00) dan sore (17.00–19.00), serta dominasi pengguna subscriber "
+ "Adanya dua waktu puncak penggunaan, yaitu pagi (07.00-09.00) dan sore (17.00-19.00), serta dominasi pengguna subscriber "
  "menunjukkan bahwa Citi Bike banyak dimanfaatkan sebagai transportasi harian untuk aktivitas bekerja atau berkomuter. "
  "Hal ini mengindikasikan pentingnya menjaga ketersediaan sepeda pada jam sibuk."),
 
@@ -708,11 +698,20 @@ elif page == "Insight & Ringkasan":
     st.markdown("---")
     st.markdown("### Implikasi Operasional")
     ops = {
-        "Rebalancing Armada": "Prioritaskan jam 07-09 dan 17-19 serta stasiun bisnis ↔ permukiman",
-        "Pricing Strategy": "Loyalty reward untuk subscriber; paket wisata untuk customer",
-        "Ekspansi Infrastruktur": "Perbesar kapasitas stasiun dengan volume keberangkatan ≠ kedatangan",
-        "Pemasaran Inklusi": "Program khusus untuk lansia, remaja, dan gender non-binary",
-        "Perencanaan Musiman": "Siapkan armada cadangan di bulan puncak; maintenance di bulan sepi",
+        "Pengelolaan Armada": 
+"Distribusi sepeda perlu lebih difokuskan pada jam sibuk pagi (07.00-09.00) dan sore (17.00-19.00), terutama pada rute antara kawasan permukiman dan pusat aktivitas kerja agar ketersediaan tetap terjaga.",
+
+"Strategi Harga dan Promosi": 
+"Program loyalitas dapat ditingkatkan untuk pengguna subscriber, sementara paket promosi atau penawaran khusus wisata lebih sesuai untuk pengguna customer.",
+
+"Pengembangan Infrastruktur": 
+"Stasiun dengan perbedaan besar antara jumlah keberangkatan dan kedatangan perlu diprioritaskan untuk penambahan kapasitas atau redistribusi armada.",
+
+"Pemasaran yang Lebih Inklusif": 
+"Kelompok pengguna seperti lansia, remaja, maupun gender non-binary masih memiliki potensi untuk dijangkau lebih luas melalui program dan kampanye yang lebih inklusif.",
+
+"Perencanaan Berdasarkan Musim": 
+"Ketersediaan armada sebaiknya ditingkatkan pada periode dengan permintaan tinggi, sementara perawatan dan pemeliharaan dapat difokuskan pada musim dengan penggunaan lebih rendah.",
     }
     for k, v in ops.items():
         st.markdown(f"- **{k}:** {v}")
