@@ -330,35 +330,45 @@ elif page == "EDA":
         st.markdown("**Statistik Deskriptif**")
         st.dataframe(df[['tripduration_min', 'age']].describe().round(2))
 
-with tab2:
-    st.markdown('<div class="section-title">Pola Temporal</div>', unsafe_allow_html=True)
-    DAY_ORDER = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
-    trend_hour = df['start_hour'].value_counts().sort_index()
+    with tab2:
+        st.markdown('<div class="section-title">Pola Temporal</div>', unsafe_allow_html=True)
+        DAY_ORDER = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+        trend_hour    = df['start_hour'].value_counts().sort_index()
+        trend_weekday = (df.groupby('start_weekday_name').size()
+                          .reindex([d for d in DAY_ORDER if d in df['start_weekday_name'].unique()]))
 
-    fig, ax = plt.subplots(figsize=(10, 5))
-    ax.bar(trend_hour.index, trend_hour.values, color=COLOR_BLUE, edgecolor='white', alpha=0.85)
-    ax.set_title('Volume Trip per Jam')
-    ax.set_xlabel('Jam'); ax.set_ylabel('Jumlah Trip')
-    ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x,_: f'{x/1000:.0f}k'))
-    plt.tight_layout()
-    st.pyplot(fig)
-    plt.close()
+        fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+        axes[0].bar(trend_hour.index, trend_hour.values, color=COLOR_BLUE, edgecolor='white', alpha=0.85)
+        axes[0].set_title('Volume Trip per Jam')
+        axes[0].set_xlabel('Jam'); axes[0].set_ylabel('Jumlah Trip')
+        axes[0].yaxis.set_major_formatter(mticker.FuncFormatter(lambda x,_: f'{x/1000:.0f}k'))
 
-    # Heatmap weekday vs weekend
-    st.markdown("**Heatmap: Jam × Hari (Weekday vs Weekend)**")
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-    for ax, is_we, label in zip(axes, [False, True], ['Weekday', 'Weekend']):
-        pivot = (df[df['is_weekend']==is_we]
-                 .groupby(['start_weekday_name', 'start_hour'])
-                 .size().unstack(fill_value=0))
-        pivot = pivot.reindex([d for d in DAY_ORDER if d in pivot.index])
-        sns.heatmap(pivot, ax=ax, cmap='YlOrRd', fmt='.0f',
-                    linewidths=0.3, cbar_kws={'shrink': 0.8})
-        ax.set_title(f'Heatmap Volume Trip — {label}')
-        ax.set_xlabel('Jam'); ax.set_ylabel('Hari')
-    plt.tight_layout()
-    st.pyplot(fig)
-    plt.close()
+        axes[1].bar(range(len(trend_weekday)), trend_weekday.values, color=PALETTE_MAIN[:7], edgecolor='white')
+        axes[1].set_xticks(range(len(trend_weekday)))
+        axes[1].set_xticklabels(trend_weekday.index, rotation=25, ha='right')
+        axes[1].set_title('Volume Trip per Hari')
+        axes[1].set_ylabel('Jumlah Trip')
+        axes[1].yaxis.set_major_formatter(mticker.FuncFormatter(lambda x,_: f'{x/1000:.0f}k'))
+
+        plt.tight_layout()
+        st.pyplot(fig)
+        plt.close()
+
+        # Heatmap weekday vs weekend
+        st.markdown("**Heatmap: Jam × Hari (Weekday vs Weekend)**")
+        fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+        for ax, is_we, label in zip(axes, [False, True], ['Weekday', 'Weekend']):
+            pivot = (df[df['is_weekend']==is_we]
+                     .groupby(['start_weekday_name', 'start_hour'])
+                     .size().unstack(fill_value=0))
+            pivot = pivot.reindex([d for d in DAY_ORDER if d in pivot.index])
+            sns.heatmap(pivot, ax=ax, cmap='YlOrRd', fmt='.0f',
+                        linewidths=0.3, cbar_kws={'shrink': 0.8})
+            ax.set_title(f'Heatmap Volume Trip — {label}')
+            ax.set_xlabel('Jam'); ax.set_ylabel('Hari')
+        plt.tight_layout()
+        st.pyplot(fig)
+        plt.close()
 
     with tab3:
         st.markdown('<div class="section-title">Analisis Demografis</div>', unsafe_allow_html=True)
