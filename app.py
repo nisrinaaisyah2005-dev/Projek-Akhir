@@ -398,7 +398,7 @@ with tab2:
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE: ANALISIS STATISTIK
 # ══════════════════════════════════════════════════════════════════════════════
-if page == "Analisis Statistik":
+elif page == "Analisis Statistik":
     st.title("Analisis Statistik")
 
     tab1, tab2, tab3, tab4 = st.tabs(["Uji Mann-Whitney", "Korelasi Spearman", "Agregasi", "Tren Musiman"])
