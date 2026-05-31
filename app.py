@@ -79,12 +79,12 @@ st.markdown("""
 GITHUB_DATA_URL = "https://raw.githubusercontent.com/nisrinaaisyah2005-dev/Projek-Akhir/refs/heads/main/df_original.csv"
 
 # ─── Load & Cache Data ────────────────────────────────────────────────────────
-@st.cache_data(show_spinner="Memuat data dari GitHub...")
+@st.cache_data(show_spinner="⏳ Memuat data dari GitHub...")
 def load_and_clean(url: str):
     try:
         df_raw = pd.read_csv(url)
     except Exception as e:
-        st.error(f"Gagal memuat data dari GitHub.\n\nPastikan URL sudah benar di variabel `GITHUB_DATA_URL`.\n\nError: {e}")
+        st.error(f"❌ Gagal memuat data dari GitHub.\n\nPastikan URL sudah benar di variabel `GITHUB_DATA_URL`.\n\nError: {e}")
         st.stop()
 
     df = df_raw.copy()
@@ -333,15 +333,12 @@ elif page == "EDA":
     with tab2:
         st.markdown('<div class="section-title">Pola Temporal</div>', unsafe_allow_html=True)
         DAY_ORDER = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
-        trend_weekday = (df.groupby('start_weekday_name').size()
-                          .reindex([d for d in DAY_ORDER if d in df['start_weekday_name'].unique()]))
+        trend_hour = df['start_hour'].value_counts().sort_index()
 
         fig, ax = plt.subplots(figsize=(10, 5))
-        ax.bar(range(len(trend_weekday)), trend_weekday.values, color=PALETTE_MAIN[:7], edgecolor='white')
-        ax.set_xticks(range(len(trend_weekday)))
-        ax.set_xticklabels(trend_weekday.index, rotation=25, ha='right')
-        ax.set_title('Volume Trip per Hari')
-        ax.set_ylabel('Jumlah Trip')
+        ax.bar(trend_hour.index, trend_hour.values, color=COLOR_BLUE, edgecolor='white', alpha=0.85)
+        ax.set_title('Volume Trip per Jam')
+        ax.set_xlabel('Jam'); ax.set_ylabel('Jumlah Trip')
         ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x,_: f'{x/1000:.0f}k'))
 
         plt.tight_layout()
@@ -698,7 +695,7 @@ elif page == "Insight & Ringkasan":
         """, unsafe_allow_html=True)
 
     st.markdown("---")
-    st.markdown("###  Implikasi Operasional")
+    st.markdown("### Implikasi Operasional")
     ops = {
         "Rebalancing Armada": "Prioritaskan jam 07-09 dan 17-19 serta stasiun bisnis ↔ permukiman",
         "Pricing Strategy": "Loyalty reward untuk subscriber; paket wisata untuk customer",
