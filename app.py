@@ -76,7 +76,7 @@ st.markdown("""
 # ─── URL Dataset dari GitHub ──────────────────────────────────────────────────
 # Ganti URL di bawah dengan raw URL file CSV kamu di GitHub
 # Format: https://raw.githubusercontent.com/<username>/<repo>/<branch>/<path/file.csv>
-GITHUB_DATA_URL = "https://raw.githubusercontent.com/nisrinaaisyah2005-dev/Projek-Akhir/refs/heads/main/df_original.csv"
+GITHUB_DATA_URL = "https://raw.githubusercontent.com/GITHUB_USERNAME/REPO_NAME/main/NYC%20Citi%20Bike%20Trips.csv"
 
 # ─── Load & Cache Data ────────────────────────────────────────────────────────
 @st.cache_data(show_spinner="Memuat data dari GitHub...")
@@ -333,22 +333,16 @@ elif page == "EDA":
     with tab2:
         st.markdown('<div class="section-title">Pola Temporal</div>', unsafe_allow_html=True)
         DAY_ORDER = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
-        trend_hour    = df['start_hour'].value_counts().sort_index()
         trend_weekday = (df.groupby('start_weekday_name').size()
                           .reindex([d for d in DAY_ORDER if d in df['start_weekday_name'].unique()]))
 
-        fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-        axes[0].bar(trend_hour.index, trend_hour.values, color=COLOR_BLUE, edgecolor='white', alpha=0.85)
-        axes[0].set_title('Volume Trip per Jam')
-        axes[0].set_xlabel('Jam'); axes[0].set_ylabel('Jumlah Trip')
-        axes[0].yaxis.set_major_formatter(mticker.FuncFormatter(lambda x,_: f'{x/1000:.0f}k'))
-
-        axes[1].bar(range(len(trend_weekday)), trend_weekday.values, color=PALETTE_MAIN[:7], edgecolor='white')
-        axes[1].set_xticks(range(len(trend_weekday)))
-        axes[1].set_xticklabels(trend_weekday.index, rotation=25, ha='right')
-        axes[1].set_title('Volume Trip per Hari')
-        axes[1].set_ylabel('Jumlah Trip')
-        axes[1].yaxis.set_major_formatter(mticker.FuncFormatter(lambda x,_: f'{x/1000:.0f}k'))
+        fig, ax = plt.subplots(figsize=(10, 5))
+        ax.bar(range(len(trend_weekday)), trend_weekday.values, color=PALETTE_MAIN[:7], edgecolor='white')
+        ax.set_xticks(range(len(trend_weekday)))
+        ax.set_xticklabels(trend_weekday.index, rotation=25, ha='right')
+        ax.set_title('Volume Trip per Hari')
+        ax.set_ylabel('Jumlah Trip')
+        ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x,_: f'{x/1000:.0f}k'))
 
         plt.tight_layout()
         st.pyplot(fig)
@@ -434,10 +428,12 @@ elif page == "Analisis Statistik":
             | Median (mnt) | {dur_sub.median():.2f} | {dur_cus.median():.2f} |
             | Mean (mnt) | {dur_sub.mean():.2f} | {dur_cus.mean():.2f} |
             """)
-            status1 = "SIGNIFIKAN (p < 0.05)" if p1 < 0.05 else "Tidak signifikan"
             st.metric("Statistik U", f"{stat1:,.0f}")
             st.metric("P-value", f"{p1:.6f}")
-            st.success(status1) if p1 < 0.05 else st.warning(status1)
+            if p1 < 0.05:
+                st.success("SIGNIFIKAN (p < 0.05)")
+            else:
+                st.warning("Tidak signifikan")
 
         with col2:
             st.markdown("**Weekday vs Weekend**")
@@ -448,10 +444,12 @@ elif page == "Analisis Statistik":
             | Median (mnt) | {dur_wd.median():.2f} | {dur_we.median():.2f} |
             | Mean (mnt) | {dur_wd.mean():.2f} | {dur_we.mean():.2f} |
             """)
-            status2 = "SIGNIFIKAN (p < 0.05)" if p2 < 0.05 else "Tidak signifikan"
             st.metric("Statistik U", f"{stat2:,.0f}")
             st.metric("P-value", f"{p2:.6f}")
-            st.success(status2) if p2 < 0.05 else st.warning(status2)
+            if p2 < 0.05:
+                st.success("SIGNIFIKAN (p < 0.05)")
+            else:
+                st.warning("Tidak signifikan")
 
         fig, axes = plt.subplots(1, 2, figsize=(12, 5))
         for ax, d1, d2, l1, l2, title in [
@@ -589,7 +587,7 @@ elif page == "Analisis Stasiun":
 # PAGE: MACHINE LEARNING
 # ══════════════════════════════════════════════════════════════════════════════
 elif page == "Machine Learning":
-    st.title("Segmentasi Pengguna - K-Means Clustering")
+    st.title("Segmentasi Pengguna — K-Means Clustering")
 
     st.info("Segmentasi berbasis perilaku: durasi perjalanan, usia, jam keberangkatan, dan hari penggunaan.")
 
@@ -670,30 +668,24 @@ elif page == "Insight & Ringkasan":
     st.title("Insight & Ringkasan Eksekutif")
 
     st.markdown("""
-    ## Ringkasan Eksekutif - NYC Citi Bike Trips
+    ## Ringkasan Eksekutif — NYC Citi Bike Trips
     
     Analisis dataset menghasilkan empat tema utama:
     """)
 
     insights = [
-        ("Pola Komuter di Kawasan Urban", COLOR_BLUE,
- "Adanya dua waktu puncak penggunaan, yaitu pagi (07.00-09.00) dan sore (17.00-19.00), serta dominasi pengguna subscriber "
- "menunjukkan bahwa Citi Bike banyak dimanfaatkan sebagai transportasi harian untuk aktivitas bekerja atau berkomuter. "
- "Hal ini mengindikasikan pentingnya menjaga ketersediaan sepeda pada jam sibuk."),
-
-("Segmentasi Pengguna yang Berbeda", COLOR_ORANGE,
- "Terdapat dua kelompok pengguna utama dengan karakteristik yang cukup berbeda. Pengguna subscriber cenderung memakai Citi Bike "
- "untuk perjalanan singkat dan rutin, sedangkan customer lebih sering menggunakan untuk rekreasi atau perjalanan santai dengan durasi lebih lama. "
- "Perbedaan ini menunjukkan bahwa strategi promosi maupun penetapan harga dapat disesuaikan untuk masing-masing segmen."),
-
-("Pengaruh Musim terhadap Penggunaan", COLOR_GREEN,
- "Jumlah penggunaan Citi Bike meningkat pada musim semi dan musim panas, kemudian menurun cukup tajam saat musim dingin. "
- "Pola ini menunjukkan bahwa faktor cuaca berpengaruh besar terhadap permintaan, sehingga perencanaan jumlah armada perlu mempertimbangkan kondisi musiman."),
-
-("Peluang Memperluas Jangkauan Pengguna", COLOR_RED,
- "Kelompok pengguna usia lanjut (65+) dan remaja masih memiliki proporsi yang rendah dibanding kelompok usia lainnya. "
- "Padahal, pengguna lansia cenderung memiliki durasi perjalanan lebih lama. Kondisi ini membuka peluang untuk program atau layanan yang lebih inklusif "
- "guna menjangkau lebih banyak pengguna dari berbagai kelompok usia."),
+        ("Pola Komuter Urban", COLOR_BLUE,
+         "Pola bimodal rush-hour (07:00-09:00 & 17:00-19:00) dan dominasi subscriber membuktikan Citi Bike berhasil "
+         "menjadi moda transportasi komuter harian. Fokus strategis: keandalan ketersediaan sepeda saat jam puncak."),
+        ("Segmentasi Pengguna Jelas", COLOR_ORANGE,
+         "Dua persona dominan: Subscriber (komuter cepat, trip pendek) dan Customer (rekreasi/wisata, trip lebih panjang ~2-3x). "
+         "Strategi pricing dan promosi harus dibedakan untuk tiap segmen."),
+        ("Pola Musiman Kuat", COLOR_GREEN,
+         "Penggunaan meningkat signifikan di musim semi/panas dan menurun drastis di musim dingin. "
+         "Rasio puncak/terendah mencerminkan kebutuhan perencanaan kapasitas armada musiman."),
+        ("Potensi Inklusi Belum Maksimal", COLOR_RED,
+         "Kelompok lansia (65+) dan remaja sangat rendah representasinya meski lansia justru bersepeda lebih lama. "
+         "Program khusus dapat meningkatkan inklusi dan memperluas basis pengguna."),
     ]
 
     for title, color, text in insights:
@@ -706,26 +698,16 @@ elif page == "Insight & Ringkasan":
         """, unsafe_allow_html=True)
 
     st.markdown("---")
-    st.markdown("### Implikasi Operasional")
+    st.markdown("###  Implikasi Operasional")
     ops = {
-        "Pengelolaan Armada": 
-"Distribusi sepeda perlu lebih difokuskan pada jam sibuk pagi (07.00-09.00) dan sore (17.00-19.00), terutama pada rute antara kawasan permukiman dan pusat aktivitas kerja agar ketersediaan tetap terjaga.",
-
-"Strategi Harga dan Promosi": 
-"Program loyalitas dapat ditingkatkan untuk pengguna subscriber, sementara paket promosi atau penawaran khusus wisata lebih sesuai untuk pengguna customer.",
-
-"Pengembangan Infrastruktur": 
-"Stasiun dengan perbedaan besar antara jumlah keberangkatan dan kedatangan perlu diprioritaskan untuk penambahan kapasitas atau redistribusi armada.",
-
-"Pemasaran yang Lebih Inklusif": 
-"Kelompok pengguna seperti lansia, remaja, maupun gender non-binary masih memiliki potensi untuk dijangkau lebih luas melalui program dan kampanye yang lebih inklusif.",
-
-"Perencanaan Berdasarkan Musim": 
-"Ketersediaan armada sebaiknya ditingkatkan pada periode dengan permintaan tinggi, sementara perawatan dan pemeliharaan dapat difokuskan pada musim dengan penggunaan lebih rendah.",
+        "Rebalancing Armada": "Prioritaskan jam 07-09 dan 17-19 serta stasiun bisnis ↔ permukiman",
+        "Pricing Strategy": "Loyalty reward untuk subscriber; paket wisata untuk customer",
+        "Ekspansi Infrastruktur": "Perbesar kapasitas stasiun dengan volume keberangkatan ≠ kedatangan",
+        "Pemasaran Inklusi": "Program khusus untuk lansia, remaja, dan gender non-binary",
+        "Perencanaan Musiman": "Siapkan armada cadangan di bulan puncak; maintenance di bulan sepi",
     }
     for k, v in ops.items():
         st.markdown(f"- **{k}:** {v}")
 
     st.markdown("---")
     st.caption("Dashboard dibuat dengan Streamlit | Data: NYC Citi Bike Trips")
-
